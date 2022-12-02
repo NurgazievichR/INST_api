@@ -7,10 +7,10 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'id', 'username', 'first_name', 'last_name', 'bio', 'avatar', 'email', 'date_joined', 'last_activity','password'
+            'id', 'username', 'first_name', 'last_name', 'bio', 'avatar', 'email', 'date_joined', 'last_activity','password', 'edited_at'
         )
         read_only_fields = ('id', 'date_joined', 'last_activity')
-        write_only_fields = ('password',)
+        extra_kwargs = {'password': {'write_only': True, 'required':False}}
     
     def update(self, instance, validated_data):
         instance.username = validated_data.get('username', instance.username)
@@ -18,7 +18,8 @@ class UserSerializer(serializers.ModelSerializer):
         instance.last_name = validated_data.get('last_name', instance.last_name)
         instance.bio = validated_data.get('bio', instance.bio)
         instance.email = validated_data.get('email', instance.email)
-        instance.avatar = validated_data.get('avatar', instance.avatar)
+        if validated_data.get('avatar'): 
+            instance.avatar = validated_data.get('avatar', instance.avatar)
         if validated_data.get('password'):
             if len(validated_data.get('password')) > 7:
                 instance.set_password(validated_data.get('password', instance.password))

@@ -23,3 +23,27 @@ class PostImage(models.Model):
 
     def __str__(self):
         return f'IMG:--{self.post.user}--{self.id}'
+
+
+
+class Save(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='saved')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='saved')
+
+    def __str__(self):
+        return f"SAVE:    {self.user}--{self.post.title}"
+
+    class Meta:
+        ordering = ('id',)
+    
+class Like(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='liked')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='liked')
+
+    def __str__(self):
+        return f"LIKE:    {self.user}--{self.post.title}"
+
+    class Meta:
+        ordering = ('id',)
+    
+    

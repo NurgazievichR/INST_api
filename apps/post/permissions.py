@@ -17,3 +17,12 @@ class IsPostOwner(permissions.BasePermission):
         if request.user == obj.user:
             return True
         return False
+
+class IsPostImageOwner(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):    
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        if request.user == obj.post.user:
+            return True
+        return False
+
