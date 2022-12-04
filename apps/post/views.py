@@ -1,7 +1,5 @@
 from django.shortcuts import render
-from rest_framework import viewsets, filters
-from rest_framework import mixins
-from rest_framework import serializers
+from rest_framework import viewsets, filters, mixins
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response

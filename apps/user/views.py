@@ -8,6 +8,7 @@ from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from rest_framework import mixins
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.filters import SearchFilter
 
 
 from apps.user.serializers import UserSerializer, UserCreateSerializer, UserFollowSerializer
@@ -15,6 +16,7 @@ from apps.user.models import UserFollow
 from apps.post.permissions import IsAccountOwner, IsPrivateInf, IsFollowOwner
 from apps.post.serializers import PostSerializer, LikeSerializer, SaveSerializer
 from apps.comment.serializers import CommentChildSerializer
+from apps.story.serializers import StorySerializer
 
 
 
@@ -24,6 +26,8 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAccountOwner,)
+    filter_backends = (SearchFilter,)
+    search_fields = ['username']
 
     def get_serializer_class(self):
         if self.action in ['create']:
@@ -70,6 +74,15 @@ class UserViewSet(viewsets.ModelViewSet):
         user = self.get_object()
         subscriptions = user.subscriptions.all()
         serializer = UserFollowSerializer(subscriptions, many=True)
+        return Response(serializer.data)
+
+
+
+    @action(detail=True, methods=['get'], permission_classes=(IsPrivateInf,))
+    def archives(self, request, pk=None):
+        user = self.get_object()
+        archives = user.stories.filter(is_archived=True)
+        serializer = StorySerializer(archives, many=True)
         return Response(serializer.data)
 
     
