@@ -24,6 +24,9 @@ class PostImage(models.Model):
     def __str__(self):
         return f'IMG:--{self.post.user}--{self.id}'
 
+    class Meta:
+        ordering = ('-id',)
+
 
 
 class Save(models.Model):

@@ -1,13 +1,15 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
+from apps.user.models import UserFollow
+
 User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'id', 'username', 'first_name', 'last_name', 'bio', 'avatar', 'email', 'date_joined', 'last_activity','password', 'edited_at'
+            'id', 'username', 'first_name', 'last_name', 'bio', 'avatar', 'email', 'date_joined', 'last_activity','password', 'edited_at',
         )
         read_only_fields = ('id', 'date_joined', 'last_activity')
         extra_kwargs = {'password': {'write_only': True, 'required':False}}
@@ -27,6 +29,12 @@ class UserSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({'password':'Пароль должен состовлять не менее 8 символов'})
         instance.save()
         return instance
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['subscriptions'] = instance.subscriptions.count()
+        representation['subscribers'] = instance.subscribers.count()
+        return representation
 
 class UserCreateSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=255, write_only=True)
@@ -55,4 +63,20 @@ class UserCreateSerializer(serializers.ModelSerializer):
             #VERIFICATION BY EMAIL
             return user
         raise serializers.ValidationError({'password':'Ваши пароли не совпадают'})
-        
+
+
+class UserFilterPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
+    def get_queryset(self):
+        user = self.context['request'].user
+        queryset = super(UserFilterPrimaryKeyRelatedField, self).get_queryset()
+        if not user or not queryset:
+            return None
+        return queryset.exclude(username=user.username)
+
+
+class UserFollowSerializer(serializers.ModelSerializer):
+    to_user = UserFilterPrimaryKeyRelatedField(queryset=User.objects.all())
+    class Meta:
+        model = UserFollow
+        fields = ('id', 'from_user', 'to_user', 'create_at')
+        read_only_fields = ('from_user', 'create_at')

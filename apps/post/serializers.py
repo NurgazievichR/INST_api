@@ -2,8 +2,19 @@ from rest_framework import serializers
 
 from apps.post.models import Post, PostImage, Save, Like
 
-class PostImageSerializer(serializers.ModelSerializer):
 
+class PostImageFilterPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
+    def get_queryset(self):
+        user = self.context['request'].user
+        queryset = super(PostImageFilterPrimaryKeyRelatedField, self).get_queryset()
+        if not user or not queryset:
+            return None
+        return queryset.filter(user=user)
+
+
+
+class PostImageSerializer(serializers.ModelSerializer):
+    post = PostImageFilterPrimaryKeyRelatedField(queryset=Post.objects.all())
     class Meta:
         model = PostImage
         fields = '__all__'
@@ -13,18 +24,7 @@ class PostImageSerializer(serializers.ModelSerializer):
         post = validated_data['post']
         if len(post.post_images.all())==5:
             raise serializers.ValidationError({'max_error':'В одной публикации может быть только 5 изображений'})
-        if not post.user == self.context['view'].request.user:
-            raise serializers.ValidationError({'post':'Вы не можете добавлять картинки к посту, пользователь которого не вы'})
         return super().create(validated_data)
-
-
-class PostSerializer(serializers.ModelSerializer):
-    post_images = PostImageSerializer(many=True, read_only=True)
-    
-    class Meta:
-        model = Post
-        fields = ('id','title','create_at','update_at','user','post_images')
-        read_only_fields = ('update_at', 'user')
 
 class SaveSerializer(serializers.ModelSerializer):
     class Meta:
@@ -49,3 +49,15 @@ class LikeSerializer(serializers.ModelSerializer):
         if len(like):
             raise serializers.ValidationError({'save':'Этот пост уже лайкнут'})
         return super().create(validated_data)
+
+
+
+
+class PostSerializer(serializers.ModelSerializer):
+    post_images = PostImageSerializer(many=True, read_only=True)
+    liked = LikeSerializer(many=True, read_only=True) 
+    
+    class Meta:
+        model = Post
+        fields = ('id','title','create_at','update_at','user','post_images','liked')
+        read_only_fields = ('update_at', 'user')
