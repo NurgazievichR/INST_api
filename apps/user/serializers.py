@@ -1,9 +1,16 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from apps.user.models import UserFollow
 
 User = get_user_model()
+
+
+class TokenObtainPairSerializer(TokenObtainPairSerializer):
+    default_error_messages = {
+        'no_active_account': ('Активная учетная запись с указанными учетными данными не найдена')
+    }
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

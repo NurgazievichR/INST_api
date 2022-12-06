@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from apps.post.models import Post, PostImage, Save, Like
+from apps.tag.serializers import TagSerializer
 
 
 class PostImageFilterPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
@@ -56,8 +57,8 @@ class LikeSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     post_images = PostImageSerializer(many=True, read_only=True)
     liked = LikeSerializer(many=True, read_only=True) 
-    
+
     class Meta:
         model = Post
-        fields = ('id','title','create_at','update_at','user','post_images','liked')
+        fields = ('id','title','create_at','update_at','user','post_images','liked',)
         read_only_fields = ('update_at', 'user')

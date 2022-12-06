@@ -1,7 +1,5 @@
-from django.shortcuts import render
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError
-from django.db.models import Count
 
 from rest_framework import viewsets
 from rest_framework.decorators import api_view, action
@@ -9,18 +7,20 @@ from rest_framework.response import Response
 from rest_framework import mixins
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.filters import SearchFilter
+from rest_framework_simplejwt.views import TokenObtainPairView as SimpleTokenObtainPairView
 
 
-from apps.user.serializers import UserSerializer, UserCreateSerializer, UserFollowSerializer
+from apps.user.serializers import UserSerializer, UserCreateSerializer, UserFollowSerializer, TokenObtainPairSerializer
 from apps.user.models import UserFollow
-from apps.post.permissions import IsAccountOwner, IsPrivateInf, IsFollowOwner
+from utils.permissions import IsAccountOwner, IsPrivateInf, IsFollowOwner
 from apps.post.serializers import PostSerializer, LikeSerializer, SaveSerializer
 from apps.comment.serializers import CommentChildSerializer
 from apps.story.serializers import StorySerializer
 
-
-
 User = get_user_model()
+
+class TokenObtainPairView(SimpleTokenObtainPairView):
+    serializer_class = TokenObtainPairSerializer
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -76,8 +76,6 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = UserFollowSerializer(subscriptions, many=True)
         return Response(serializer.data)
 
-
-
     @action(detail=True, methods=['get'], permission_classes=(IsPrivateInf,))
     def archives(self, request, pk=None):
         user = self.get_object()
@@ -85,7 +83,6 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = StorySerializer(archives, many=True)
         return Response(serializer.data)
 
-    
 @api_view(['GET'])
 def current_user(request):
     if request.user.is_authenticated:

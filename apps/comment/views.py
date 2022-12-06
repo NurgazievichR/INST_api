@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from apps.comment.models import Comment
 from apps.comment.serializers import CommentSerializer
-from apps.post.permissions import IsCommentOwnerOrPostOwner
+from utils.permissions import IsCommentOwnerOrPostOwner
 
 class CommentsViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = Comment.objects.all()
