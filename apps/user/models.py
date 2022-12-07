@@ -8,7 +8,9 @@ class User(AbstractUser):
     avatar = models.ImageField(upload_to='user_avatar', blank=True, null=True)
     last_activity = models.DateTimeField(default=timezone.now)
     bio = models.CharField(max_length=255, blank=True, null=True)
-    edited_at = models.DateTimeField(auto_now=True)
+    is_private = models.BooleanField(default=False)
+    is_online = models.BooleanField(default=False)
+    hide_status = models.BooleanField(default=False)
     
     def __str__(self):
         return self.username 
@@ -20,6 +22,7 @@ class User(AbstractUser):
 class UserFollow(models.Model):
     to_user = models.ForeignKey(User, related_name='subscribers', on_delete=models.CASCADE)
     from_user = models.ForeignKey(User, related_name="subscriptions", on_delete=models.CASCADE)
+    is_confirmed = models.BooleanField()
     create_at = models.DateTimeField(auto_now_add=True) 
 
 

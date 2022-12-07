@@ -50,3 +50,26 @@ class IsFollowOwner(permissions.BasePermission):
         if obj.from_user == request.user or obj.to_user == request.user:
             return True 
         return False
+
+
+class IsPrivateAccount(permissions.BasePermission):
+    message = 'This is private account'
+    def has_object_permission(self, request, view, obj):  
+        if obj.is_private == True:
+            if request.user == obj:
+                return True
+            subs = obj.subscribers.all()
+            subs2 = request.user.subscriptions.all()
+            isFollowed = tuple(set(subs) & set(subs2))
+            if isFollowed and isFollowed[0].is_confirmed == True:
+                return True
+            return False
+        return True
+
+
+class RequestFollowAcceptPermission(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if obj.to_user == request.user and request.user.is_private == True:
+            return True
+        return False
+

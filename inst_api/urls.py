@@ -41,8 +41,8 @@ schema_view = get_schema_view(
 )
 
 api_patterns = [
+    path('', include('apps.post.urls')),
     path('us/', include('apps.user.urls')),
-    path('posts/', include('apps.post.urls')),
     path('comments/', include('apps.comment.urls')),
     path('stories/', include('apps.story.urls')),
     path('tags/', include('apps.tag.urls')),
@@ -51,7 +51,7 @@ api_patterns = [
     #auth
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('token/verify', TokenVerifyView.as_view(), name='token_obtain_pair'),
+    path('token/verify/', TokenVerifyView.as_view(), name='token_obtain_pair'),
 ]
 
 

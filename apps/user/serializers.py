@@ -16,10 +16,10 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'id', 'username', 'first_name', 'last_name', 'bio', 'avatar', 'email', 'date_joined', 'last_activity','password', 'edited_at',
+            'id', 'username', 'first_name', 'last_name', 'bio', 'avatar', 'email', 'date_joined', 'last_activity', 'is_private','is_online', 'hide_status', 'password',
         )
-        read_only_fields = ('id', 'date_joined', 'last_activity')
-        extra_kwargs = {'password': {'write_only': True, 'required':False}}
+        read_only_fields = ('id', 'date_joined', 'last_activity', 'is_online',)
+        extra_kwargs = {'password': {'write_only': True, 'required':False}, 'hide_status':{'write_only':True}}
     
     def update(self, instance, validated_data):
         instance.username = validated_data.get('username', instance.username)
@@ -27,6 +27,8 @@ class UserSerializer(serializers.ModelSerializer):
         instance.last_name = validated_data.get('last_name', instance.last_name)
         instance.bio = validated_data.get('bio', instance.bio)
         instance.email = validated_data.get('email', instance.email)
+        instance.is_private = validated_data.get('is_private', instance.is_private)
+        instance.hide_status = validated_data.get('hide_status', instance.hide_status)
         if validated_data.get('avatar'): 
             instance.avatar = validated_data.get('avatar', instance.avatar)
         if validated_data.get('password'):
@@ -38,9 +40,14 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
     def to_representation(self, instance):
+        subs = instance.subscribers.all()
+        subs2 = self.context['request'].user.subscriptions.all()
+        isFollowed = tuple(set(subs) & set(subs2))
         representation = super().to_representation(instance)
-        representation['subscriptions'] = instance.subscriptions.count()
-        representation['subscribers'] = instance.subscribers.count()
+        representation['subscriptions'] = instance.subscriptions.filter(is_confirmed=True).count()
+        representation['subscribers'] = instance.subscribers.filter(is_confirmed=True).count()
+        representation['is_followed'] = True if isFollowed and isFollowed[0].is_confirmed == True else False
+
         return representation
 
 class UserCreateSerializer(serializers.ModelSerializer):
@@ -85,5 +92,12 @@ class UserFollowSerializer(serializers.ModelSerializer):
     to_user = UserFilterPrimaryKeyRelatedField(queryset=User.objects.all())
     class Meta:
         model = UserFollow
-        fields = ('id', 'from_user', 'to_user', 'create_at')
-        read_only_fields = ('from_user', 'create_at')
+        fields = ('id', 'from_user', 'to_user', 'create_at', 'is_confirmed')
+        read_only_fields = ('from_user', 'create_at', 'is_confirmed')
+
+class UserAcceptFollowRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserFollow
+        fields = ('id', 'from_user', 'create_at', 'is_confirmed')
+        read_only_fields = ('id', 'from_user', 'create_at',)
+        
