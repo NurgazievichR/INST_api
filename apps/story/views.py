@@ -12,7 +12,7 @@ class StoryViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, mixins.Dest
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsPostOwner)
 
     def get_queryset(self):
-        stories = Story.objects.filter(user_id__in=[i.to_user.id for i in self.request.user.subscriptions.filter(is_confirmed=True)], is_archived=False).order_by('-create_at') | Story.objects.filter(user=self.request.user)
+        stories = Story.objects.filter(user_id__in=[i.to_user.id for i in self.request.user.subscriptions.filter(is_confirmed=True)], is_archived=False).order_by('-create_at') | Story.objects.filter(user=self.request.user) if self.request.user.is_authenticated else Story.objects.none()
         return stories
 
     def perform_create(self, serializer):

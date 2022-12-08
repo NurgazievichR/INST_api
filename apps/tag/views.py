@@ -19,7 +19,10 @@ class TagViewSet(mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.Ge
     @action(detail=True, methods=['get'])
     def posts(self, request, pk=None):
         tag = get_object_or_404(Tag, pk=pk)
-        posts = tag.post.all() & Post.objects.filter(user_id__in=[i.to_user.id for i in self.request.user.subscriptions.filter(is_confirmed=True)]) | Post.objects.filter(user__is_private=False) | Post.objects.filter(user=request.user)
+        if request.user.is_authenticated:
+            posts = tag.post.all() & Post.objects.filter(user_id__in=[i.to_user.id for i in self.request.user.subscriptions.filter(is_confirmed=True)]) | Post.objects.filter(user__is_private=False) | Post.objects.filter(user=request.user)
+        else:
+            posts = tag.post.all() & Post.objects.filter(user__is_private=False)
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)
 

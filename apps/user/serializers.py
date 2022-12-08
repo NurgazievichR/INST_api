@@ -40,14 +40,14 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
     def to_representation(self, instance):
-        subs = instance.subscribers.all()
-        subs2 = self.context['request'].user.subscriptions.all()
-        isFollowed = tuple(set(subs) & set(subs2))
         representation = super().to_representation(instance)
+        if self.context['request'].user.is_authenticated:
+            subs = instance.subscribers.all()
+            subs2 = self.context['request'].user.subscriptions.all()
+            isFollowed = tuple(set(subs) & set(subs2))
+            representation['is_followed'] = True if isFollowed and isFollowed[0].is_confirmed == True else False
         representation['subscriptions'] = instance.subscriptions.filter(is_confirmed=True).count()
         representation['subscribers'] = instance.subscribers.filter(is_confirmed=True).count()
-        representation['is_followed'] = True if isFollowed and isFollowed[0].is_confirmed == True else False
-
         return representation
 
 class UserCreateSerializer(serializers.ModelSerializer):
