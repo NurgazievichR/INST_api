@@ -13,6 +13,11 @@ class TokenObtainPairSerializer(TokenObtainPairSerializer):
     }
 
 class UserSerializer(serializers.ModelSerializer):
+    is_online = serializers.SerializerMethodField(source='is_online') 
+
+    def get_is_online(self, obj):
+        return obj.is_online() if obj.hide_status == False else False
+        
     class Meta:
         model = User
         fields = (

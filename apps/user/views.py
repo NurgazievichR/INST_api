@@ -90,20 +90,11 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = StorySerializer(stories, many=True)
         return Response(serializer.data)
 
-@api_view(['GET'])
-def current_user(request):
-    if request.user.is_authenticated:
-        serializer = UserSerializer(request.user)
-        return Response(serializer.data)
-    return Response({'Authentication Error':'You\'re not authenticated yet'})
 
-class UserFollowViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.DestroyModelMixin,mixins.UpdateModelMixin, viewsets.GenericViewSet):
+class UserFollowViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,mixins.UpdateModelMixin, viewsets.GenericViewSet):
     queryset = UserFollow.objects.all()
     serializer_class = UserFollowSerializer
     permission_classes = (IsAuthenticatedOrReadOnly(), IsFollowOwner())
-
-    # def get_queryset(self):
-    #     return UserFollow.objects.filter(to_user=self.request.user)
 
     def get_permissions(self):
         if self.action in ['update']:

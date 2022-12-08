@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
-from django.contrib.auth import get_user_model
 
 
 class User(AbstractUser):
@@ -18,6 +17,11 @@ class User(AbstractUser):
     class Meta: 
         ordering = ('-id',)
 
+    def is_online(self):
+        if timezone.now() - self.last_activity < timezone.timedelta(minutes=3):
+            return True
+        return False
+
 
 class UserFollow(models.Model):
     to_user = models.ForeignKey(User, related_name='subscribers', on_delete=models.CASCADE)
@@ -32,3 +36,5 @@ class UserFollow(models.Model):
     class Meta:
         ordering = ('-create_at',)  
         unique_together = (('from_user', 'to_user'),)
+
+    

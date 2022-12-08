@@ -65,6 +65,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'utils.middleware.LastActivityMiddleware',
 ]
 
 ROOT_URLCONF = 'inst_api.urls'
