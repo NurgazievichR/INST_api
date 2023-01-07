@@ -15,6 +15,8 @@ class Story(models.Model):
 
     class Meta:
         ordering = ('-create_at',)
+        verbose_name = 'Сторис'
+        verbose_name_plural = 'Сторисы'
 
     
 

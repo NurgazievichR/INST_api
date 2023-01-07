@@ -25,9 +25,14 @@ class TokenObtainPairView(SimpleTokenObtainPairView):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,IsAccountOwner,)
+    permission_classes = (IsAccountOwner(),)
     filter_backends = (SearchFilter,)
     search_fields = ['username']
+
+    def get_permissions(self):
+        if self.action in ['create']:
+            return (AllowAny(),)
+        return self.permission_classes
 
     def get_serializer_class(self):
         if self.action in ['create']:

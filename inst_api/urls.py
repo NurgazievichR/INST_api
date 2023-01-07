@@ -42,7 +42,7 @@ schema_view = get_schema_view(
 
 api_patterns = [
     path('', include('apps.post.urls')),
-    path('us/', include('apps.user.urls')),
+    path('', include('apps.user.urls')),
     path('comments/', include('apps.comment.urls')),
     path('stories/', include('apps.story.urls')),
     path('tags/', include('apps.tag.urls')),
@@ -58,6 +58,7 @@ api_patterns = [
 
 
 urlpatterns = [
+    path('jet/', include('jet.urls', 'jet')),
     path('admin/', admin.site.urls),
     path('', include(api_patterns)),
 ]

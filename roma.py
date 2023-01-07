@@ -1,1 +1,0 @@
-# celery -A inst_api worker --loglevel=INFO --pool=solo

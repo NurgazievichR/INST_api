@@ -15,6 +15,8 @@ class Post(models.Model):
 
     class Meta:
         ordering = ('-create_at',)
+        verbose_name = 'Пост'
+        verbose_name_plural = 'Посты'
 
 
 class PostImage(models.Model):
@@ -26,6 +28,8 @@ class PostImage(models.Model):
 
     class Meta:
         ordering = ('-id',)
+        verbose_name = 'Картинка к посту'
+        verbose_name_plural = 'Картинки к посту'
 
 
 
@@ -38,6 +42,8 @@ class Save(models.Model):
 
     class Meta:
         ordering = ('id',)
+        verbose_name = 'Сохранённое'
+        verbose_name_plural = 'Сохранённые'
     
 class Like(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='liked')
@@ -48,5 +54,7 @@ class Like(models.Model):
 
     class Meta:
         ordering = ('id',)
+        verbose_name = 'Лайкнутый'
+        verbose_name_plural = 'Лайкнутые'
     
     

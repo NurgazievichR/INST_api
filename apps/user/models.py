@@ -8,7 +8,7 @@ class User(AbstractUser):
     last_activity = models.DateTimeField(default=timezone.now)
     bio = models.CharField(max_length=255, blank=True, null=True)
     is_private = models.BooleanField(default=False)
-    is_online = models.BooleanField(default=False)
+    is_online = models.BooleanField(default=False, null=True)
     hide_status = models.BooleanField(default=False)
     
     def __str__(self):
@@ -16,6 +16,8 @@ class User(AbstractUser):
 
     class Meta: 
         ordering = ('-id',)
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
 
     def is_online(self):
         if timezone.now() - self.last_activity < timezone.timedelta(minutes=3):
@@ -36,5 +38,7 @@ class UserFollow(models.Model):
     class Meta:
         ordering = ('-create_at',)  
         unique_together = (('from_user', 'to_user'),)
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
 
     
